@@ -7,7 +7,6 @@ import os, sys, json, logging, tempfile, time
 from pathlib import Path
 from datetime import datetime
 
-# ── AUTO-WRITE CONFIG (dark theme, hide topbar) ────────────────────────────────
 _cfg = Path(__file__).parent / ".streamlit" / "config.toml"
 _cfg.parent.mkdir(exist_ok=True)
 _cfg.write_text("""\
