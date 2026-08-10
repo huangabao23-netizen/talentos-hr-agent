@@ -1,84 +1,57 @@
 # TalentOS HR Agent
 
-TalentOS is a Streamlit-based HR intelligence platform for JD generation, resume screening, talent sourcing, and feedback-driven Skill optimization.
+[English Version](./README_EN.md)
 
-The product principle is human-in-the-loop: AI can generate, parse, score, search, summarize, and suggest improvements, but all recruiting decisions and rule changes require explicit human confirmation.
+TalentOS HR Agent 是一个基于 Streamlit 的招聘智能体平台，用于支持 JD 生成、简历筛选、人才开源和反馈驱动的 Skill 优化。
 
-## Current Features
+系统遵循 human-in-the-loop 原则：AI 负责生成、解析、检索、评分和总结，岗位确认、候选人分层、人才入库、反馈记录和 Skill 修改都需要人工确认。
 
-### 1. JD Generation
+## 主要功能
 
-- Generate a structured JD from simple hiring inputs.
-- Infer job fields from short natural-language descriptions.
-- Produce candidate-facing JD text, internal job profile, screening strategy, and interview focus.
-- Confirmed JDs enter the job library and can be reused by resume screening and talent sourcing.
-- JD drafts and confirmed job profiles are persisted locally.
+### JD 生成
 
-### 2. Resume Screening
+- 根据简单岗位需求生成 JD 草稿。
+- 自动整理岗位画像、筛选策略和面试关注点。
+- 用户确认后进入岗位库。
+- 已确认岗位可被简历筛选和人才开源复用。
 
-- Select a confirmed JD from the job library.
-- Upload resumes and parse candidate profiles.
-- Run evidence-based person-job matching.
-- Apply social-hiring or campus-hiring Matching Skill rules.
-- HR manually marks candidates as recommended, pending, or not recommended.
-- Candidate decisions enter the feedback tracking workflow.
+### 简历筛选
 
-### 3. Talent Sourcing
+- 从岗位库选择已确认 JD。
+- 上传简历并解析候选人画像。
+- 基于社招或校招 Matching Skill 做人岗匹配。
+- 用户手动标记推荐、待定或不推荐。
+- 筛选结果进入反馈追踪。
 
-- Create a sourcing task manually or from an existing confirmed JD.
-- Generate sourcing strategy, keywords, search queries, risk notes, and data-source priorities.
-- Search public sources including GitHub and arXiv.
-- Optional Google Scholar providers are supported through third-party APIs.
-- Company People API integration is reserved but disabled until configured.
-- External candidates can be reviewed one at a time, with evidence links and authenticity status.
-- Candidates enter the talent pool only after manual confirmation.
+### 人才开源
 
-### 4. Feedback Tracking
+- 支持手动创建寻访任务，或从已确认 JD 创建。
+- 生成寻访策略、关键词、搜索 query 和风险提示。
+- 支持 GitHub、arXiv 等公开来源。
+- 预留公司 People API 接入。
+- 候选线索需要人工核验后才可入库。
 
-- Track follow-up results for screened candidates.
-- Collect final interview or business-screening feedback.
-- Classify valid optimization samples.
-- Summarize feedback tags, misjudgment types, and Skill-level sample statistics.
-- Generate optimization suggestions after enough valid feedback samples.
-- Suggestions are draft-only; Skill files are not modified without human confirmation.
+### 反馈追踪
 
-### 5. Workflow / Matching Management
+- 记录候选人的后续业务筛选、面试和最终结果。
+- 累积有效反馈样本。
+- 生成 Skill 优化建议草案。
+- 优化建议不会自动写入 Skill，需要人工确认。
 
-The management page separates two kinds of Skill:
+### Workflow / Matching 管理
 
-- Workflow Skill: model call flow, prompt purpose, output schema, and safety boundaries.
-- Matching Skill: scoring dimensions, weights, evidence rules, positive signals, negative signals, and interview focus.
+- Workflow Skill：管理模型调用链路、Prompt、输出结构和边界。
+- Matching Skill：管理评分维度、权重、证据规则、正负向信号和面试关注点。
 
-Current Workflow Skills:
-
-- `skills/workflows/jd_generation_workflow.md`
-- `skills/workflows/resume_screening_workflow.md`
-- `skills/workflows/talent_sourcing_workflow.md`
-- `skills/workflows/feedback_optimization_workflow.md`
-
-Current Matching Skills:
-
-- `skills/matching/dev_social_v1.md`
-- `skills/matching/dev_campus_v1.md`
-
-## Architecture
+## 项目结构
 
 ```text
-app.py
+talentos-hr-agent/
+├── app.py
 ├── modules/
 │   ├── jd_generation/
-│   │   ├── jd_generator.py
-│   │   └── jd_parser.py
 │   ├── resume_screening/
-│   │   ├── profile_parser.py
-│   │   ├── scoring_engine.py
-│   │   ├── ranker.py
-│   │   ├── report_gen.py
-│   │   └── interview_gen.py
 │   ├── talent_pool/
-│   │   ├── sourcing.py
-│   │   ├── talent_pool.py
-│   │   └── people_system.py
 │   └── analytics/
 ├── skills/
 │   ├── workflows/
@@ -88,28 +61,71 @@ app.py
 │   ├── file_loader.py
 │   ├── llm_client.py
 │   └── security.py
-└── models/
-    └── schemas.py
+├── models/
+│   └── schemas.py
+├── docs/
+│   └── people_system_api_contract.md
+├── requirements.txt
+├── .env.example
+└── README.md
 ```
 
-SQLite is used for local persistence. Runtime data is stored under `data/`, which is intentionally ignored by Git.
+## 核心目录说明
 
-## LLM Providers
+```text
+modules/jd_generation/
+```
 
-The platform supports provider selection through environment variables and the Streamlit sidebar.
+JD 字段识别、JD 生成和 JD 解析。
 
-Supported providers:
+```text
+modules/resume_screening/
+```
 
-- MiniMax through Anthropic-compatible SDK endpoint.
-- Groq through the Groq SDK.
+简历解析、人岗匹配评分、排序、报告和面试题生成。
 
-Main configuration lives in `.env.example`. Copy it to `.env` and fill in local secrets.
+```text
+modules/talent_pool/
+```
+
+人才开源、候选线索核验、外部人才库和 People API 适配。
+
+```text
+skills/workflows/
+```
+
+业务 Workflow Skill，包括 JD 生成、简历筛选、人才开源和反馈调优。
+
+```text
+skills/matching/
+```
+
+社招和校招 Matching Skill，用 Markdown 维护评分规则。
+
+## 运行方法
+
+### 1. 创建虚拟环境
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 2. 安装依赖
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. 配置环境变量
 
 ```bash
 cp .env.example .env
 ```
 
-Important variables:
+然后在 `.env` 中填写需要使用的模型或数据源配置。
+
+常用配置：
 
 ```bash
 LLM_PROVIDER=minimax
@@ -126,103 +142,21 @@ PEOPLE_API_BASE_URL=
 PEOPLE_API_TOKEN=
 ```
 
-Do not commit `.env`. It is ignored by `.gitignore`.
-
-## People API Integration
-
-The internal talent pool is not simulated with local demo data.
-
-People API features are enabled only when `PEOPLE_API_BASE_URL` is configured. Until then:
-
-- Internal People API search returns no records.
-- The UI displays the People API as not connected.
-- Local SQLite talent records are treated only as external manually confirmed candidates.
-
-See:
-
-```text
-docs/people_system_api_contract.md
-```
-
-## Setup
+### 4. 启动应用
 
 ```bash
-git clone <repo_url>
-cd talentos-hr-agent
-
-python3 -m venv venv
-source venv/bin/activate
-
-pip install -r requirements.txt
-cp .env.example .env
-```
-
-Edit `.env` and add the API keys you want to use.
-
-## Run
-
-```bash
-source venv/bin/activate
 streamlit run app.py
 ```
 
-Or explicitly:
+或：
 
 ```bash
 python -m streamlit run app.py --server.address 127.0.0.1 --server.port 8501
 ```
 
-Open:
+浏览器打开：
 
 ```text
 http://127.0.0.1:8501
 ```
-
-## Recommended Workflow
-
-1. Open `JD 生成`.
-2. Enter basic hiring need and generate a JD.
-3. Review and manually confirm the JD into the job library.
-4. Open `简历筛选`.
-5. Select the confirmed JD and upload resumes.
-6. Review AI matching results and manually mark candidate tiers.
-7. Complete feedback later in `反馈追踪`.
-8. After enough valid feedback samples, review Skill optimization suggestions.
-
-For sourcing:
-
-1. Open `人才开源`.
-2. Create a sourcing task manually or from a confirmed JD.
-3. Confirm sourcing strategy.
-4. Generate candidate leads from public sources.
-5. Review one candidate at a time.
-6. Manually mark focus, reject, or add to external talent pool.
-
-## Security And Data Handling
-
-Ignored by Git:
-
-- `.env`
-- `data/`
-- `*.db`
-- `*.bak`
-- `*.log`
-- `venv/`
-- generated local runtime files
-
-Before pushing, verify:
-
-```bash
-git status --short --ignored
-git ls-tree -r --name-only HEAD | rg '(^\.env$|^data/|\.db$|\.bak$|hr_agent\.log|^venv/)'
-```
-
-The second command should return no tracked sensitive runtime files.
-
-## Current Repository Notes
-
-- The Streamlit theme is configured for a light beige and mint-green SaaS style.
-- Workflow and Matching Skills are Markdown-backed and intended for HR review.
-- AI suggestions never automatically modify Matching Skill files.
-- The current GitHub repository is private by default.
 
