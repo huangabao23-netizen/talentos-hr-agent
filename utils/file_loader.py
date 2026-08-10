@@ -49,7 +49,7 @@ def extract_text_from_file(file_bytes: bytes, filename: str) -> str:
         return extract_text_from_pdf(file_bytes)
     elif ext in (".docx", ".doc"):
         return extract_text_from_docx(file_bytes)
-    elif ext == ".txt":
+    elif ext in (".txt", ".md", ".csv"):
         try:
             return file_bytes.decode("utf-8", errors="replace")
         except Exception:

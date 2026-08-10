@@ -5,8 +5,14 @@ __pycache__/
 .venv/
 venv/
 outputs/
+data/
+*.db
+*.sqlite
+*.sqlite3
+*.bak
 *.log
 .DS_Store
 *.html
 *.json
 !sample_data/
+=0.40.0
